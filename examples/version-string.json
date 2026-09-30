@@ -1,0 +1,15 @@
+{
+  "lane": "os",
+  "title": "Controller.VERSION is still 0.8.6",
+  "invariant_id": "INV-VERSION-STRING",
+  "status": "open",
+  "issue_ready": true,
+  "file": "src/seedcash/controller.py",
+  "function": "Controller.VERSION",
+  "broken_check": "The UI version string is 0.8.6 while git describe at 364cccc is v.1.0.0-161-g364cccc.",
+  "impact_class": "display",
+  "fix_direction": "Show the release or the commit the operator can compare to the tree that was reviewed.",
+  "evidence": "VERSION = \"0.8.6\"",
+  "commit": "364cccc",
+  "severity": "low"
+}

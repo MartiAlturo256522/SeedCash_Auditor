@@ -1,0 +1,66 @@
+{
+  "lanes": [
+    {
+      "id": "signer",
+      "skill": "seedcash-signer",
+      "agent": "agents/signer.md",
+      "reads": [
+        "src/seedcash/models/psbt_signer.py",
+        "src/seedcash/models/wallet.py"
+      ]
+    },
+    {
+      "id": "cashtoken",
+      "skill": "seedcash-cashtokens",
+      "agent": "agents/cashtoken.md",
+      "reads": [
+        "src/seedcash/models/psbt_parser.py"
+      ]
+    },
+    {
+      "id": "qr",
+      "skill": "seedcash-qr",
+      "agent": "agents/qr-channel.md",
+      "reads": [
+        "src/seedcash/models/decode_qr.py",
+        "src/seedcash/helpers/qr.py",
+        "src/seedcash/helpers/ur2/"
+      ]
+    },
+    {
+      "id": "custody",
+      "skill": "seedcash-custody",
+      "agent": "agents/seed-custody.md",
+      "reads": [
+        "src/seedcash/models/bip39.py",
+        "src/seedcash/models/seed.py",
+        "src/seedcash/models/bip44.py"
+      ]
+    },
+    {
+      "id": "wysiwys",
+      "skill": "seedcash-wysiwys",
+      "agent": "agents/wysiwys.md",
+      "reads": [
+        "src/seedcash/views/psbt_views.py",
+        "src/seedcash/gui/screens/psbt_screens.py",
+        "src/seedcash/gui/components.py",
+        "src/seedcash/controller.py"
+      ]
+    },
+    {
+      "id": "os",
+      "skill": "seedcash-os",
+      "agent": "agents/os-image.md",
+      "reads": [
+        "opt/pi0/board/kernel.config"
+      ]
+    },
+    {
+      "id": "delta",
+      "skill": "seedsigner-baseline",
+      "agent": "agents/seedsigner-delta.md",
+      "checklist": "brain/delta-checklist.md"
+    }
+  ]
+}

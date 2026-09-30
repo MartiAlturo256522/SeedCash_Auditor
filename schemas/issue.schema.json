@@ -1,0 +1,13 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "Draft GitHub issue",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["title", "body", "issue_ready", "refuse_reason"],
+  "properties": {
+    "title": { "type": "string" },
+    "body": { "type": "string" },
+    "issue_ready": { "type": "boolean" },
+    "refuse_reason": { "type": "string" }
+  }
+}

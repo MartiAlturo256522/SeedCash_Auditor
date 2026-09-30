@@ -1,0 +1,55 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "SeedCash audit finding",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "lane",
+    "title",
+    "invariant_id",
+    "status",
+    "issue_ready",
+    "file",
+    "function",
+    "broken_check",
+    "impact_class",
+    "fix_direction",
+    "evidence",
+    "commit"
+  ],
+  "properties": {
+    "lane": {
+      "type": "string",
+      "enum": ["signer", "cashtoken", "qr", "custody", "wysiwys", "os", "delta"]
+    },
+    "title": { "type": "string", "minLength": 1, "maxLength": 120 },
+    "invariant_id": { "type": "string" },
+    "status": { "type": "string", "enum": ["open", "closed", "unchecked"] },
+    "issue_ready": { "type": "boolean" },
+    "file": { "type": "string", "minLength": 1 },
+    "function": { "type": "string", "minLength": 1 },
+    "broken_check": { "type": "string", "minLength": 1 },
+    "impact_class": {
+      "type": "string",
+      "enum": [
+        "theft",
+        "wysiwys",
+        "invalid-signature",
+        "griefing",
+        "fail-open",
+        "custody",
+        "airgap",
+        "supply-chain",
+        "spec-deviation",
+        "display"
+      ]
+    },
+    "fix_direction": { "type": "string", "minLength": 1 },
+    "evidence": { "type": "string", "minLength": 1 },
+    "commit": { "type": "string", "minLength": 1 },
+    "severity": {
+      "type": "string",
+      "enum": ["critical", "high", "medium", "low", "info"]
+    }
+  }
+}
