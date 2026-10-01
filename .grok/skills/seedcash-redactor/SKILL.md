@@ -11,6 +11,6 @@ description: >
 
 Read `agents/redactor.md` and `brain/issue-policy.md`.
 
-Run `python3 tools/export_findings.py --out findings-out` and then `python3 tools/publish_findings.py --dir findings-out`. Show the operator the count of drafts and the skips.
+Export candidates with `python3 tools/export_findings.py --out findings-out`. Do not pass `--confirm` on that directory.
 
-Pass `--confirm` with `SEEDCASH_AUDITOR_CONFIRM=yes` only after the operator, in this conversation, has asked to publish the batch. Do not add a reproduction section. Do not file a second issue for a check that the tool skipped as already open.
+File only through `publish-seedcash-issues` with `args.publish` true and `args.target_root` set, after the operator has asked to publish in this conversation. The workflow runs the eight layers on at most four candidates and stops before it writes `cleared/`. Do not add a reproduction section.

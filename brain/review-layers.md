@@ -1,8 +1,10 @@
 # Review layers
 
-Three read-only layers run after the specialist lanes, in this order. Each layer sees only the findings the previous layer kept. The workflow drops a finding when a layer is missing, fails, sets `keep` false, or returns empty `evidence`. A drop is not a pass, and it is not a license to rewrite the finding into a different bug.
+The audit runs Quote, then Reach, then Impact. The upload gauntlet runs all eight layers below, in this order, as a fresh reading. Each layer sees only the findings the previous layer kept. The workflow drops a finding when a layer is missing, fails, sets `keep` false, or returns empty `evidence`. A drop is not a pass, and it is not a license to rewrite the finding into a different bug.
 
-None of these layers writes a triggering transaction, a command, or a payload. The impact classes are defined in `brain/disclosure.md`.
+An issue needs every layer. The stamp is checked by `tools/gates.py`. Setting `issue_ready` on a draft does not replace a layer.
+
+None of these layers writes a triggering transaction, a command, or a payload. The impact classes are defined in `brain/disclosure.md`. The BCH facts are `brain/bch.md`. The SeedSigner lessons are `brain/seedsigner-lessons.md`.
 
 ### Quote
 
@@ -36,3 +38,35 @@ Do not re-open the quote or the reach. `keep` is false when the class overclaims
 When the bug is real and the class is one step too hot, `keep` is true and `impact_class` is the honest class from the disclosure enum. An empty or invented class leaves the specialist's class unchanged. `evidence` names the disclosure rule that was applied.
 
 `issue_ready` stays false when the finding already has it false, and becomes false when the invariant says `file_ready: no`. This layer does not turn it true. Quote and Reach copy `issue_ready` through and leave `impact_class` empty.
+
+### BCH
+
+Question: does the claim match `brain/bch.md`?
+
+Do not re-open the quote. `keep` is false when a fact in that file contradicts the finding, or when the impact class is hotter than the fact allows. `keep` is true when the class still matches. `evidence` names the fact.
+
+### Domain
+
+Question: does a specialist who did not write the finding still see the broken check?
+
+Pick the one perspective in `brain/perspectives.json` whose files cover the finding. Re-read that function. `evidence` contains `perspective:` and the perspective id. `keep` is true only when the new quote shows the same broken check. `keep` is false when the hunter misread the function.
+
+### Experience
+
+Question: did SeedSigner already learn this, and does SeedCash still miss it?
+
+Read `brain/seedsigner-lessons.md` and the titles on `SeedSigner/seedsigner`. `evidence` names SeedSigner and the lesson. `keep` is false when SeedCash already enforces the lesson. `keep` is true when the quote shows the lesson is still missing. Do not copy a reproduction from an issue or a forum post.
+
+### Prior
+
+Question: does SeedCash already have an issue for this check?
+
+Run `python3 tools/list_issues.py --state all` and compare the invariant id and the title with every open and closed issue. `keep` is false when the same check already has an issue. `evidence` then includes that issue number.
+
+`keep` is true only when the list was read and `evidence` contains `no matching issue`. A failed list is `keep` false. Do not paste a reproduction from an old issue.
+
+### Counter
+
+Question: what is the strongest reason this is a false positive?
+
+Re-read the function. `keep` is false when a caller rejects the input, the quote does not show the bug, or the class overclaims. `keep` is true only when that attempt fails. `evidence` says what was refuted.

@@ -11,10 +11,30 @@ sys.path.insert(0, str(ROOT / "tools"))
 
 import export_findings
 import file_issue
+import gates
 import lint_brain
+import list_issues
 import publish_findings
+import write_cleared
 
 FORBIDDEN = ("steps to reproduce", "proof of concept", "exploit", "payload")
+
+
+def stamp():
+    evidence = {
+        "quote": "The quoted lines still show the broken check in the named function.",
+        "reach": "The overview caller reaches the signer with this amount on screen.",
+        "impact": "The disclosure class wysiwys matches bytes the screen did not show.",
+        "bch": "BCH sighash commits to the output amount, so the class stays wysiwys.",
+        "domain": "perspective: wysiwys. The overview still feeds the output sum forward.",
+        "experience": "SeedSigner shows the input sum on its own line in the overview.",
+        "prior_issues": "no matching issue on SeedCashOrg/seedcash for this overview check.",
+        "counter": "A refutation that the headline is the documented input sum failed.",
+    }
+    return {
+        "gates": {name: True for name in gates.REQUIRED_GATES},
+        "gate_evidence": evidence,
+    }
 
 
 def sample(**overrides):
@@ -34,6 +54,7 @@ def sample(**overrides):
         "severity": "high",
         "dedupe_terms": ["INV-OVERVIEW-AMOUNT"],
     }
+    finding.update(stamp())
     finding.update(overrides)
     return finding
 
@@ -139,6 +160,12 @@ class PublishFindingsTest(unittest.TestCase):
         ]
         self.assertFalse(any("INV-SCHNORR-TAG" in " ".join(call) for call in created_findings))
 
+    def test_ungated_finding_is_refused_without_create(self):
+        root = self.write_dir([sample(gates={}, gate_evidence={})])
+        code = publish_findings.main(["--dir", str(root), "--repo", "SeedCashOrg/seedcash"])
+        self.assertEqual(code, 1)
+        self.assertFalse(any("create" in call for call in self.calls))
+
     def test_confirm_without_env_exits_before_create(self):
         root = self.write_dir([sample()])
         with self.assertRaises(SystemExit) as caught:
@@ -147,3 +174,44 @@ class PublishFindingsTest(unittest.TestCase):
             )
         self.assertEqual(caught.exception.code, 2)
         self.assertFalse(any("create" in call for call in self.calls))
+
+
+class IssueToolsTest(unittest.TestCase):
+    def test_list_issues_never_creates(self):
+        calls = []
+        original = file_issue.run_gh
+
+        def fake_gh(args):
+            calls.append(list(args))
+            body = json.dumps([{"number": 81, "title": "schnorr tag", "state": "open"}])
+            return subprocess.CompletedProcess(args, 0, body, "")
+
+        file_issue.run_gh = fake_gh
+        try:
+            code = list_issues.main(["--repo", "SeedCashOrg/seedcash", "--state", "all"])
+        finally:
+            file_issue.run_gh = original
+        self.assertEqual(code, 0)
+        self.assertEqual(len(calls), 1)
+        self.assertNotIn("create", calls[0])
+        self.assertIn("all", calls[0])
+
+    def test_write_cleared_rejects_a_draft_without_gates(self):
+        with tempfile.TemporaryDirectory() as tmp:
+            root = Path(tmp)
+            source = root / "batch.json"
+            source.write_text(json.dumps([sample(gates={}, gate_evidence={})]), encoding="utf-8")
+            kept, rejected = write_cleared.write_cleared(source, root / "out")
+        self.assertEqual(kept, 0)
+        self.assertEqual(rejected, 1)
+
+    def test_write_cleared_keeps_a_stamped_finding(self):
+        self.assertTrue(gates.gates_ok(sample()))
+        with tempfile.TemporaryDirectory() as tmp:
+            root = Path(tmp)
+            source = root / "batch.json"
+            source.write_text(json.dumps([sample()]), encoding="utf-8")
+            kept, rejected = write_cleared.write_cleared(source, root / "out")
+            written = list((root / "out").glob("*.json"))
+        self.assertEqual((kept, rejected), (1, 0))
+        self.assertEqual(len(written), 1)

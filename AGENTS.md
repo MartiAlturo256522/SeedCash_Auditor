@@ -14,4 +14,4 @@ The pin in `brain/pin.md` is a memory of the last tree that was read. `git rev-p
 
 A finding names the broken check, the impact class, the file, the function, and a fix direction. It does not include a triggering transaction or a command payload. That rule's only home is `brain/disclosure.md`.
 
-Issue filing's only home is `brain/issue-policy.md`. One finding goes through `tools/file_issue.py`. A directory of findings goes through `agents/redactor.md`. A run without `--confirm` does not call `gh issue create`.
+Issue filing's only home is `brain/issue-policy.md`. One finding goes through `tools/file_issue.py`. A directory of findings goes through `agents/redactor.md`. Both refuse a finding that has not passed the eight gates in `tools/gates.py`. A run without `--confirm` does not call `gh issue create`. Existing issues are read with `tools/list_issues.py`.

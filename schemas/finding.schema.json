@@ -54,6 +54,36 @@
     "dedupe_terms": {
       "type": "array",
       "items": { "type": "string", "minLength": 1 }
+    },
+    "gates": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["quote", "reach", "impact", "bch", "domain", "experience", "prior_issues", "counter"],
+      "properties": {
+        "quote": { "type": "boolean" },
+        "reach": { "type": "boolean" },
+        "impact": { "type": "boolean" },
+        "bch": { "type": "boolean" },
+        "domain": { "type": "boolean" },
+        "experience": { "type": "boolean" },
+        "prior_issues": { "type": "boolean" },
+        "counter": { "type": "boolean" }
+      }
+    },
+    "gate_evidence": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["quote", "reach", "impact", "bch", "domain", "experience", "prior_issues", "counter"],
+      "properties": {
+        "quote": { "type": "string", "minLength": 40 },
+        "reach": { "type": "string", "minLength": 40 },
+        "impact": { "type": "string", "minLength": 40 },
+        "bch": { "type": "string", "minLength": 40 },
+        "domain": { "type": "string", "minLength": 40 },
+        "experience": { "type": "string", "minLength": 40 },
+        "prior_issues": { "type": "string", "minLength": 40 },
+        "counter": { "type": "string", "minLength": 40 }
+      }
     }
   }
 }

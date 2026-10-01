@@ -209,19 +209,71 @@ def check() -> list[str]:
         errors.append("missing brain/review-layers.md")
     else:
         layer_text = layers_path.read_text(encoding="utf-8")
-        for heading in ("### Quote", "### Reach", "### Impact"):
+        for heading in (
+            "### Quote",
+            "### Reach",
+            "### Impact",
+            "### BCH",
+            "### Domain",
+            "### Experience",
+            "### Prior",
+            "### Counter",
+        ):
             if heading not in layer_text:
                 errors.append(f"review-layers.md missing {heading}")
     for rel in (
         "agents/review-quote.md",
         "agents/review-reach.md",
         "agents/review-impact.md",
+        "agents/review-bch.md",
+        "agents/review-domain.md",
+        "agents/review-experience.md",
+        "agents/review-prior.md",
+        "agents/review-counter.md",
+        "brain/bch.md",
+        "brain/seedsigner-lessons.md",
+        "tools/list_issues.py",
+        "tools/gates.py",
     ):
         if not (ROOT / rel).is_file():
             errors.append(f"missing {rel}")
-
+    perspectives_path = ROOT / "brain" / "perspectives.json"
+    if not perspectives_path.is_file():
+        errors.append("missing brain/perspectives.json")
+    else:
+        perspectives = json.loads(perspectives_path.read_text(encoding="utf-8"))["perspectives"]
+        seen_perspective = set()
+        for item in perspectives:
+            perspective_id = item["id"]
+            if perspective_id in seen_perspective:
+                errors.append(f"duplicate perspective {perspective_id}")
+            seen_perspective.add(perspective_id)
+            if perspective_id not in audit_text:
+                errors.append(f"audit workflow omits perspective {perspective_id}")
+            agent = ROOT / item["agent"]
+            if not agent.is_file():
+                errors.append(f"perspective {perspective_id} missing {item['agent']}")
+            skill = ROOT / ".grok" / "skills" / item["skill"] / "SKILL.md"
+            if not skill.is_file():
+                errors.append(f"perspective {perspective_id} missing skill {item['skill']}")
+            else:
+                front = skill.read_text(encoding="utf-8").split("---", 2)[1]
+                if f"name: {item['skill']}" not in front:
+                    errors.append(f"skill {item['skill']} frontmatter name mismatch")
     publish_text = publish_path.read_text(encoding="utf-8")
-    for snippet in ('phase("Draft")', 'phase("Confirm")', "await_user", "do_publish != true"):
+    for snippet in (
+        'phase("Draft")',
+        'phase("Confirm")',
+        'id: "prior"',
+        'id: "counter"',
+        'title: "Prior"',
+        'title: "Counter"',
+        "await_user",
+        "do_publish != true",
+        "list_issues.py",
+        "write_cleared.py",
+        "--dir cleared",
+    ):
         if snippet not in publish_text:
             errors.append(f"publish workflow missing gate: {snippet}")
     if "publish_findings.py" not in redactor_path.read_text(encoding="utf-8"):

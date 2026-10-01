@@ -16,6 +16,8 @@ import sys
 import tempfile
 from pathlib import Path
 
+import gates
+
 CONFIRM_ENV = "SEEDCASH_AUDITOR_CONFIRM"
 CONFIRM_VALUE = "yes"
 FORBIDDEN_KEYS = {"reproduction", "repro", "poc", "payload", "exploit", "steps"}
@@ -258,6 +260,8 @@ def main(argv: list[str] | None = None) -> int:
         refuse("duplicate search failed; not filing")
     if duplicates and not args.allow_duplicate:
         refuse("a similar open issue exists; pass --allow-duplicate to file anyway")
+    if not gates.gates_ok(finding):
+        refuse("finding has not passed the eight review gates")
 
     url = create_issue(repo, title, body)
     print(url)

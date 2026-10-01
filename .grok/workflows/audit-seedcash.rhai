@@ -1,10 +1,11 @@
 let meta = #{
     name: "audit-seedcash",
-    description: "Read-only SeedCash audit: specialist lanes, then quote, reach, and impact filters",
-    when_to_use: "Audit a SeedCash tree. /audit-seedcash with args.auditor_root and args.target_root.",
+    description: "Read-only SeedCash audit: specialist lanes and perspectives, then quote, reach, and impact filters",
+    when_to_use: "Audit a SeedCash tree. /audit-seedcash with args.auditor_root and args.target_root. Filing is a later gauntlet.",
     phases: [
         #{ title: "Orient", detail: "Pin the tree under review" },
-        #{ title: "Hunt", detail: "One specialist per lane" },
+        #{ title: "Issues", detail: "Read open and closed SeedCash issue titles" },
+        #{ title: "Hunt", detail: "One specialist per lane and perspective" },
         #{ title: "Quote", detail: "Drop findings whose quote is not in the function" },
         #{ title: "Reach", detail: "Drop findings the user cannot reach" },
         #{ title: "Impact", detail: "Drop overclaimed impact classes" },
@@ -44,7 +45,7 @@ fn honest_class(cls) {
     cls == "theft" || cls == "wysiwys" || cls == "invalid-signature" || cls == "griefing" || cls == "fail-open" || cls == "custody" || cls == "airgap" || cls == "supply-chain" || cls == "spec-deviation" || cls == "display"
 }
 
-fn lane_prompt(auditor, target, os_root, baseline, lane) {
+fn lane_prompt(auditor, target, os_root, baseline, lane, digest) {
     let p = "You are one lane of a SeedCash security auditor. Use read_file and grep on the tree. Do not modify any file. Do not write a triggering transaction, a command, or a payload.\n\n";
     p += "lane id: ";
     p += lane;
@@ -57,7 +58,9 @@ fn lane_prompt(auditor, target, os_root, baseline, lane) {
     p += "\nbaseline_root: ";
     p += baseline;
     p += "\n\nRead auditor_root/brain/disclosure.md, auditor_root/brain/invariants.md, auditor_root/brain/lanes.json, and the agent file named for this lane id. Re-read every invariant for your lane, including rows marked closed. A closed check that the code no longer implements is a regression with status open.\n\n";
-    p += "Three later layers will drop a finding whose quote is not in the function, whose path cannot reach a signature or the air gap, or whose impact class overclaims. Return at most 4 findings you can point at. Each needs lane, title, invariant_id, status, issue_ready, file, function, broken_check, impact_class, fix_direction, evidence, commit. evidence is a short quote of the check. Empty findings is valid only after you have opened the files.";
+    p += "Also read auditor_root/brain/perspectives.json, auditor_root/brain/bch.md, and auditor_root/brain/seedsigner-lessons.md. If this lane id is a perspective, read its agent file. Set each finding's lane to the invariant lane: signer, cashtoken, qr, custody, wysiwys, os, or delta.\n\n";
+    p += "Three later layers will drop a finding whose quote is not in the function, whose path cannot reach a signature or the air gap, or whose impact class overclaims. This report does not create an issue. Return at most 4 findings you can point at. Each needs lane, title, invariant_id, status, issue_ready, file, function, broken_check, impact_class, fix_direction, evidence, commit. evidence is a short quote of the check. Empty findings is valid only after you have opened the files.\n\nPrior issue titles:\n";
+    p += digest;
     p
 }
 
@@ -181,7 +184,7 @@ fn append_killed(into, rows) {
 
 fn render_report(target, confirmed, killed, note) {
     let report = "# SeedCash audit\n\n";
-    report += "A finding is listed under Confirmed only after the quote, reach, and impact layers all kept it.\n\n";
+    report += "A finding is listed under Confirmed only after quote, reach, and impact. Confirmed is not an issue. The upload gauntlet is publish-seedcash-issues.\n\n";
     report += "target: ";
     report += target;
     report += "\nconfirmed: ";
@@ -322,12 +325,39 @@ if orient != () && orient.success && orient.output != () {
     log("orient did not return a commit");
 }
 
+phase("Issues");
+let issue_schema = #{
+    "type": "object",
+    "required": ["digest"],
+    "properties": #{
+        "digest": #{ "type": "string" },
+    },
+};
+let issue_prompt = "Read existing SeedCash issues. From auditor_root run python3 tools/list_issues.py --state all. Put each printed line into digest. If the command fails, digest is unavailable. Do not create an issue. Do not modify a file.\n\nauditor_root: ";
+issue_prompt += auditor;
+let issue_list = agent(issue_prompt, #{
+    label: "prior-issues",
+    capability_mode: "execute",
+    output_schema: issue_schema,
+});
+let digest = "";
+try {
+    if issue_list != () && issue_list.success && issue_list.output != () {
+        digest = txt(issue_list.output.digest);
+    }
+} catch (issue_err) {
+    log("issue list missing: " + issue_err);
+}
+if digest == "" {
+    digest = "unavailable";
+}
+
 phase("Hunt");
-let lanes = ["signer", "cashtoken", "qr", "custody", "wysiwys", "os", "delta"];
+let lanes = ["signer", "cashtoken", "qr", "custody", "wysiwys", "os", "delta", "tx-construction", "cashtoken-genesis", "cashtoken-nft", "cashtoken-ft", "psbt-v145", "ur-emit", "python-practice", "rpi-zero", "rpi-hardware", "seedsigner-experience"];
 let jobs = [];
 for lane in lanes {
     jobs.push(#{
-        prompt: lane_prompt(auditor, target, os_root, baseline, lane),
+        prompt: lane_prompt(auditor, target, os_root, baseline, lane, digest),
         label: "hunt:" + lane,
         capability_mode: "read-only",
         output_schema: finding_schema,

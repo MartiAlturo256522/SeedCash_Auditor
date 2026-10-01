@@ -4,4 +4,4 @@ Draft one English issue from one finding JSON. The shape is `templates/github-is
 
 Refuse, with a reason, when `status` is not `open`, when `issue_ready` is not true, when the lane is `os` and no OS repo was passed, or when the body would need a section the disclosure file forbids.
 
-You do not call `gh`. The tool `tools/file_issue.py` does, and only after the operator confirms. A directory of findings is `agents/redactor.md`.
+You do not call `gh`. The tool `tools/file_issue.py` does, and only after the operator confirms and `tools/gates.py` accepts the eight gates. A directory of findings is `agents/redactor.md`. Titles already filed are listed by `tools/list_issues.py`.

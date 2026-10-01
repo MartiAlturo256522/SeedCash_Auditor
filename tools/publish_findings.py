@@ -16,9 +16,10 @@ from pathlib import Path
 sys.path.insert(0, str(Path(__file__).resolve().parent))
 
 import file_issue
+import gates
 
 
-def list_open_titles(repo: str) -> list[dict]:
+def list_titles(repo: str) -> list[dict]:
     result = file_issue.run_gh(
         [
             "gh",
@@ -27,11 +28,11 @@ def list_open_titles(repo: str) -> list[dict]:
             "--repo",
             repo,
             "--state",
-            "open",
+            "all",
             "--limit",
             "200",
             "--json",
-            "number,title",
+            "number,title,state",
         ]
     )
     if result.returncode != 0:
@@ -65,7 +66,7 @@ def publish(directory: Path, repo: str, confirm: bool, allow_duplicate: bool) ->
     search_error = ""
     titles: list[dict] = []
     try:
-        titles = list_open_titles(repo)
+        titles = list_titles(repo)
     except (RuntimeError, json.JSONDecodeError, OSError) as exc:
         search_error = str(exc)
         print(f"open-issue list skipped: {search_error}", file=sys.stderr)
@@ -82,9 +83,15 @@ def publish(directory: Path, repo: str, confirm: bool, allow_duplicate: bool) ->
             terms = [str(terms)]
         hit = matching_open(titles, [str(term) for term in terms])
         label = finding.get("invariant_id") or path.name
+        if not gates.gates_ok(finding):
+            refused.append(f"{label}: gates")
+            print(f"refused {label}: eight review gates are incomplete", file=sys.stderr)
+            continue
         if hit and not allow_duplicate:
-            skipped.append(f"{label} already open as #{hit.get('number')} {hit.get('title')}")
-            print(f"skip {label}: #{hit.get('number')} {hit.get('title')}")
+            skipped.append(
+                f"{label} already {hit.get('state') or 'open'} as #{hit.get('number')} {hit.get('title')}"
+            )
+            print(f"skip {label}: #{hit.get('number')} {hit.get('state') or 'open'} {hit.get('title')}")
             continue
         argv = ["--finding", str(path), "--repo", repo]
         if allow_duplicate:

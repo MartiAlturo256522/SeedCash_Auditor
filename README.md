@@ -13,7 +13,7 @@ Los chequeos viven en `brain/invariants.md`. Cada skill y cada agente apuntan ah
 | `brain/` | Modelo de amenazas, arquitectura, invariantes, política de issues |
 | `agents/` | Encargo de cada carril |
 | `.grok/skills/` | Skills que Grok carga al trabajar en este repo |
-| `.grok/workflows/` | Auditoría completa, reverificación, un issue y el lote |
+| `.grok/workflows/` | Auditoría, reverificación y el filtro largo antes de un issue |
 | `tools/file_issue.py` | Un hallazgo: borrador siempre; `gh` solo con confirmación |
 | `tools/publish_findings.py` | El lote: un issue por hallazgo listo, saltando los que ya están abiertos |
 | `checklists/release.md` | Orden antes de grabar una imagen |
@@ -55,7 +55,9 @@ La pasada corta, solo sobre las filas marcadas `open`:
 
 Mismos `auditor_root`, `target_root` y `os_root`.
 
-`/audit-seedcash` pone tres filtros detrás de los carriles. Están en `brain/review-layers.md`. Quote comprueba que la función sigue diciendo eso. Reach comprueba que el camino llega a una firma, a la semilla o al air gap. Impact tumba la clase de impacto cuando está inflada. Un hallazgo queda confirmado solo si los tres lo mantienen. Los que caen salen en la lista de eliminados, con la capa, el invariante y el motivo. Una pasada completa puede lanzar hasta unos 80 agentes: uno de orientación, siete carriles y, como mucho, 24 hallazgos por cada una de las tres capas.
+`/audit-seedcash` lee primero los títulos de los issues ya abiertos y cerrados. Luego lanza los siete carriles y diez perspectivas más: construcción de la transacción, génesis, NFT y fungibles de CashTokens, PSBT, el UR que sale del aparato, Python, la Pi Zero, el hardware y la experiencia acumulada de SeedSigner. Detrás van tres filtros: Quote, Reach e Impact. Un informe confirmado todavía no es un issue.
+
+Los hechos de BCH están en `brain/bch.md`. Lo aprendido en SeedSigner, en `brain/seedsigner-lessons.md`. Las perspectivas, en `brain/perspectives.json`.
 
 Los flujos son de solo lectura sobre SeedCash. El informe lo escribe el propio flujo, campo a campo.
 
@@ -79,20 +81,16 @@ El flujo `file-seedcash-issue` hace lo mismo y se detiene a pedir confirmación 
 
 El repo de destino por defecto es el `issue_repo` de `brain/pin.md`.
 
-El redactor escribe un issue por cada fila `file_ready: yes`. Primero el borrador del lote, sin crear nada:
+El redactor exporta candidatos. No los publica.
 
 ```bash
 python3 tools/export_findings.py --out findings-out
-python3 tools/publish_findings.py --dir findings-out
+python3 tools/list_issues.py --state all
 ```
 
-Publicar ese lote, solo después de pedirlo en esta conversación:
+Para crear issues hace falta el flujo `publish-seedcash-issues` con `args.publish` en `true` y `args.target_root` apuntando al árbol. Ese flujo vuelve a leer el código con ocho agentes distintos por hallazgo: Quote, Reach, Impact, BCH, el especialista del campo, la experiencia de SeedSigner, los issues anteriores y un agente que intenta tumbar el hallazgo. Como mucho entran cuatro hallazgos. Si sobreviven, se detiene y pide confirmación. Solo entonces escribe `cleared/` y llama a `gh`. Un candidato sin esos ocho sellos lo rechaza `tools/gates.py`. Un título que ya existe, abierto o cerrado, se salta.
 
-```bash
-SEEDCASH_AUDITOR_CONFIRM=yes python3 tools/publish_findings.py --dir findings-out --confirm
-```
-
-El flujo `publish-seedcash-issues` hace el borrador y se detiene. Llega a crear issues cuando `args.publish` es `true` y se reanuda la confirmación. Un título que ya está abierto se salta. La política está en `brain/issue-policy.md`.
+La política está en `brain/issue-policy.md`.
 
 ## Comprobaciones de este repo
 

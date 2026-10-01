@@ -8,21 +8,21 @@ The body follows `templates/github-issue.md`. The renderer is `tools/file_issue.
 
 All of the following are required:
 
-1. Quote, Reach, and Impact each kept the finding with evidence, or the operator re-read the lines and set `issue_ready` true on the finding JSON. The layer contract is `brain/review-layers.md`.
+1. All eight layers in `brain/review-layers.md` kept the finding. The finding JSON carries `gates` and `gate_evidence` for `quote`, `reach`, `impact`, `bch`, `domain`, `experience`, `prior_issues`, and `counter`. `tools/gates.py` is the check. A draft with `issue_ready` true and no gates is not ready.
 2. The finding's `status` is `open` and `issue_ready` is true.
 3. The lane is not `os`, unless the operator passed `--repo` for an OS repository.
-4. `gh issue list` shows no open issue with the same title, unless the operator passed `--allow-duplicate`.
+4. `python3 tools/list_issues.py --state all` shows no open or closed issue with the same title, unless the operator passed `--allow-duplicate`. The Prior layer already did this comparison. The filer does it again.
 5. The operator ran the filer with `--confirm` and `SEEDCASH_AUDITOR_CONFIRM=yes`.
 
 `tools/file_issue.py` prints the title and the body and does not call `gh issue create` until step 5. The workflow `file-seedcash-issue` stops for a human confirmation before it can reach step 5.
 
 ## Batch
 
-`agents/redactor.md` exports every `file_ready: yes` row. `tools/publish_findings.py` files that directory, one issue per JSON file. The batch passes `--repo` on every call, so an image finding in the directory is filed on that repo. The single-finding tool still requires an explicit `--repo` when the lane is `os`.
+`agents/redactor.md` exports every `file_ready: yes` row as a candidate. Candidates are not issues. `tools/publish_findings.py` files a directory only when each JSON passes `tools/gates.py`, then skips a title that already appears on an open or closed issue. The batch passes `--repo` on every call, so an image finding in the directory is filed on that repo. The single-finding tool still requires an explicit `--repo` when the lane is `os`, and it still requires the eight gates.
 
-Before it renders a finding, the batch skips it when an open issue title already contains the invariant id or another phrase in `dedupe_terms`. Creation still requires step 5. If the open-issue list fails, a confirmed batch stops before any create.
+Creation still requires step 5. If the issue list fails, a confirmed batch stops before any create.
 
-The workflow `publish-seedcash-issues` prints the drafts and stops. It reaches step 5 only when `args.publish` is true and the operator resumes past the confirmation.
+The workflow `publish-seedcash-issues` prints the candidate count and stops. With `args.publish` true it runs the eight layers on at most four candidates, stops for the operator, writes `cleared/` only for survivors, and only then calls the filer. A missing `target_root` stops that path.
 
 ## Severity
 

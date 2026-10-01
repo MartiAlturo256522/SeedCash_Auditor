@@ -1,0 +1,64 @@
+{
+  "perspectives": [
+    {
+      "id": "tx-construction",
+      "skill": "seedcash-tx",
+      "agent": "agents/tx-construction.md",
+      "reads": ["src/seedcash/models/psbt_signer.py", "src/seedcash/models/psbt_parser.py"]
+    },
+    {
+      "id": "cashtoken-genesis",
+      "skill": "seedcash-genesis",
+      "agent": "agents/cashtoken-genesis.md",
+      "reads": ["src/seedcash/models/psbt_parser.py"]
+    },
+    {
+      "id": "cashtoken-nft",
+      "skill": "seedcash-nft",
+      "agent": "agents/cashtoken-nft.md",
+      "reads": ["src/seedcash/views/psbt_views.py", "src/seedcash/models/psbt_parser.py"]
+    },
+    {
+      "id": "cashtoken-ft",
+      "skill": "seedcash-ft",
+      "agent": "agents/cashtoken-ft.md",
+      "reads": ["src/seedcash/views/psbt_views.py", "src/seedcash/models/psbt_parser.py"]
+    },
+    {
+      "id": "psbt-v145",
+      "skill": "seedcash-psbt",
+      "agent": "agents/psbt-v145.md",
+      "reads": ["src/seedcash/models/psbt_parser.py", "src/seedcash/models/psbt_signer.py"]
+    },
+    {
+      "id": "ur-emit",
+      "skill": "seedcash-ur-emit",
+      "agent": "agents/ur-emit.md",
+      "reads": ["src/seedcash/helpers/ur2/", "src/seedcash/helpers/qr.py", "src/seedcash/models/decode_qr.py"]
+    },
+    {
+      "id": "python-practice",
+      "skill": "seedcash-python",
+      "agent": "agents/python-practice.md",
+      "reads": ["src/seedcash/"]
+    },
+    {
+      "id": "rpi-zero",
+      "skill": "seedcash-rpi-zero",
+      "agent": "agents/rpi-zero.md",
+      "reads": ["opt/pi0/board/kernel.config"]
+    },
+    {
+      "id": "rpi-hardware",
+      "skill": "seedcash-hardware",
+      "agent": "agents/rpi-hardware.md",
+      "reads": ["src/seedcash/hardware/"]
+    },
+    {
+      "id": "seedsigner-experience",
+      "skill": "seedsigner-experience",
+      "agent": "agents/seedsigner-experience.md",
+      "reads": ["brain/seedsigner-lessons.md"]
+    }
+  ]
+}
