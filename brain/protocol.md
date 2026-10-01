@@ -7,14 +7,17 @@ The run is `audit-seedcash`. A cheaper pass over rows already marked `open` is `
 1. Read `brain/pin.md`, `brain/scope.md`, `brain/disclosure.md`, and this file.
 2. `git rev-parse HEAD` in the tree under review. Record the commit on the report. If it differs from `brain/pin.md`, the pin is stale and the report says so. Do not edit the target to make them match.
 3. Each lane reads its files from `brain/lanes.json` and re-checks every invariant with its lane, including rows marked `closed`. A closed row that no longer matches the code is a regression, which is a new open finding.
-4. New breaks that have no invariant yet are reported with an empty `invariant_id`. The operator adds an invariant only after the skeptic confirms the finding. The check text is added here, in `brain/invariants.md`, not copied into a skill.
-5. A skeptic confirms a finding only after opening the named file. Missing evidence leaves the finding unconfirmed. Unconfirmed findings stay out of the issue queue.
+4. New breaks that have no invariant yet are reported with an empty `invariant_id`. The operator adds an invariant only after all three review layers confirm the finding. The check text is added in `brain/invariants.md`, not copied into a skill.
+5. The review contract is `brain/review-layers.md`. Quote, then Reach, then Impact. A layer that fails or returns no evidence eliminates the finding. Eliminated findings stay out of the issue queue and are listed in the report with the layer and the reason.
 6. The report is assembled from the finding fields. It has no reproduction section.
 
 ## Rules that the script enforces
 
-- Specialists and skeptics run read-only.
+- Specialists and the three review layers run read-only.
 - A finding without a file and a broken check is dropped.
+- A second copy of the same file, function, and invariant is dropped before the review layers.
+- A row the specialist marked `closed` is dropped. A regression is reported with status `open`.
+- An `os` finding is dropped when no `os_root` was passed.
 - The report is rendered by the workflow from those fields, so a specialist cannot append a payload section later.
 - OS lanes that were given no `os_root` record a skip. A skip is not a pass.
 

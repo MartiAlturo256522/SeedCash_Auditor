@@ -1,16 +1,20 @@
 {
   "$schema": "https://json-schema.org/draft/2020-12/schema",
-  "title": "Skeptic verdict",
+  "title": "Review-layer verdict",
   "type": "object",
   "additionalProperties": false,
-  "required": ["real", "reason", "evidence"],
+  "required": ["keep", "reason", "evidence", "impact_class", "issue_ready"],
   "properties": {
-    "real": { "type": "boolean" },
+    "keep": { "type": "boolean" },
     "reason": { "type": "string" },
     "evidence": { "type": "string" },
-    "severity": {
+    "impact_class": {
       "type": "string",
-      "enum": ["critical", "high", "medium", "low", "info"]
+      "description": "Honest class from the disclosure enum. Empty on the quote and reach layers."
+    },
+    "issue_ready": {
+      "type": "boolean",
+      "description": "The impact layer may set this false. It cannot turn a false into true."
     }
   }
 }

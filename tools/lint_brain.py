@@ -182,9 +182,30 @@ def check() -> list[str]:
     for field in schema["required"]:
         if field not in audit_text:
             errors.append(f"audit workflow omits finding field {field}")
-    for field in ("real", "reason", "evidence"):
-        if field not in audit_text:
-            errors.append(f"audit workflow omits verdict field {field}")
+    for snippet in (
+        'phase("Quote")',
+        'phase("Reach")',
+        'phase("Impact")',
+        "verdict.output.keep == true",
+        'txt(verdict.output.evidence) != ""',
+    ):
+        if snippet not in audit_text:
+            errors.append(f"audit workflow missing fail-closed gate: {snippet}")
+    layers_path = ROOT / "brain" / "review-layers.md"
+    if not layers_path.is_file():
+        errors.append("missing brain/review-layers.md")
+    else:
+        layer_text = layers_path.read_text(encoding="utf-8")
+        for heading in ("### Quote", "### Reach", "### Impact"):
+            if heading not in layer_text:
+                errors.append(f"review-layers.md missing {heading}")
+    for rel in (
+        "agents/review-quote.md",
+        "agents/review-reach.md",
+        "agents/review-impact.md",
+    ):
+        if not (ROOT / rel).is_file():
+            errors.append(f"missing {rel}")
 
     for name in ("seedcash-audit", "seedcash-issue"):
         skill = ROOT / ".grok" / "skills" / name / "SKILL.md"

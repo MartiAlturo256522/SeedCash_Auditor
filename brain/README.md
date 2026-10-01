@@ -11,6 +11,7 @@ One fact, one file.
 | `invariants.md` | Every check, its status, and whether it can become an issue |
 | `delta-checklist.md` | SeedSigner questions that are not themselves SeedCash bugs |
 | `protocol.md` | Order of a run |
+| `review-layers.md` | Quote, Reach, and Impact filters that drop false positives |
 | `disclosure.md` | How a finding is allowed to be written |
 | `issue-policy.md` | When `gh` may be called |
 | `lanes.json` | Which skill and agent file belongs to a lane |

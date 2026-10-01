@@ -8,7 +8,7 @@ The body follows `templates/github-issue.md`. The renderer is `tools/file_issue.
 
 All of the following are required:
 
-1. A skeptic in the audit workflow set `real` true and wrote evidence from the file it opened, or the operator re-read the lines and set `issue_ready` true on the finding JSON.
+1. Quote, Reach, and Impact each kept the finding with evidence, or the operator re-read the lines and set `issue_ready` true on the finding JSON. The layer contract is `brain/review-layers.md`.
 2. The finding's `status` is `open` and `issue_ready` is true.
 3. The lane is not `os`, unless the operator passed `--repo` for an OS repository.
 4. `gh issue list` shows no open issue with the same title, unless the operator passed `--allow-duplicate`.

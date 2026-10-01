@@ -54,7 +54,9 @@ La pasada corta, solo sobre las filas marcadas `open`:
 
 Mismos `auditor_root`, `target_root` y `os_root`.
 
-Los dos flujos son de solo lectura sobre SeedCash. El informe sale del propio flujo, campo a campo, para que nadie le pegue una sección de reproducción al final.
+`/audit-seedcash` pone tres filtros detrás de los carriles. Están en `brain/review-layers.md`. Quote comprueba que la función sigue diciendo eso. Reach comprueba que el camino llega a una firma, a la semilla o al air gap. Impact tumba la clase de impacto cuando está inflada. Un hallazgo queda confirmado solo si los tres lo mantienen. Los que caen salen en la lista de eliminados, con la capa, el invariante y el motivo. Una pasada completa puede lanzar hasta unos 80 agentes: uno de orientación, siete carriles y, como mucho, 24 hallazgos por cada una de las tres capas.
+
+Los flujos son de solo lectura sobre SeedCash. El informe lo escribe el propio flujo, campo a campo.
 
 ## Issues
 

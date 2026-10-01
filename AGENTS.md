@@ -8,6 +8,7 @@ Read, in order:
 2. `brain/disclosure.md`
 3. `brain/invariants.md` for the lane you were given
 4. The agent brief in `agents/` for that lane
+5. `brain/review-layers.md` when the job is to confirm or kill a finding
 
 The pin in `brain/pin.md` is a memory of the last tree that was read. `git rev-parse` on the tree you open wins. Say when they differ.
 
