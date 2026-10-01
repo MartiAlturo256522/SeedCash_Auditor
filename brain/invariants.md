@@ -362,9 +362,9 @@ A flashed image, or the Buildroot output `.config`, has to show networking compi
 - impact: supply-chain
 - status_at_pin: open
 - file_ready: yes
-- where: `brain/pin.md` `os_commit`
+- where: `seedcash-os` `image commit`
 
-At the pin, the app commit is `364cccc` (2026-09-25) and the OS commit is `355b94f8` (2026-06-25). The image that boots is not the app tree that was reviewed. The pass condition is that the OS commit the operator builds is the commit named next to the app commit in the release notes, and that this file's pin records both.
+At the pin, the app commit is `364cccc` (2026-09-25) and the OS commit is `355b94f8` (2026-06-25). The image that boots is not the app tree that was reviewed. The pass condition is that the OS commit the operator builds is the commit named next to the app commit in the release notes.
 
 ### INV-VERSION-STRING
 

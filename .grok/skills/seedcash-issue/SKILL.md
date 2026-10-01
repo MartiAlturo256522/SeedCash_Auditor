@@ -14,4 +14,4 @@ Run `python3 tools/file_issue.py --finding <path>` and show the operator the pri
 
 Call `gh` only when the operator, in this conversation, has approved that exact draft. The command is then `SEEDCASH_AUDITOR_CONFIRM=yes python3 tools/file_issue.py --finding <path> --confirm`.
 
-Do not file a batch of open invariants because they are listed in `brain/invariants.md`.
+A batch of ready findings is `agents/redactor.md`.

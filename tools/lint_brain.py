@@ -87,9 +87,22 @@ def check() -> list[str]:
     audit_path = ROOT / ".grok" / "workflows" / "audit-seedcash.rhai"
     reverify_path = ROOT / ".grok" / "workflows" / "reverify-corpus.rhai"
     file_path = ROOT / ".grok" / "workflows" / "file-seedcash-issue.rhai"
+    publish_path = ROOT / ".grok" / "workflows" / "publish-seedcash-issues.rhai"
+    redactor_path = ROOT / "agents" / "redactor.md"
     schema_path = ROOT / "schemas" / "finding.schema.json"
 
-    for path in (pin_path, inv_path, lanes_path, delta_path, audit_path, reverify_path, file_path, schema_path):
+    for path in (
+        pin_path,
+        inv_path,
+        lanes_path,
+        delta_path,
+        audit_path,
+        reverify_path,
+        file_path,
+        publish_path,
+        redactor_path,
+        schema_path,
+    ):
         if not path.is_file():
             errors.append(f"missing {path.relative_to(ROOT)}")
     if errors:
@@ -207,10 +220,21 @@ def check() -> list[str]:
         if not (ROOT / rel).is_file():
             errors.append(f"missing {rel}")
 
-    for name in ("seedcash-audit", "seedcash-issue"):
+    publish_text = publish_path.read_text(encoding="utf-8")
+    for snippet in ('phase("Draft")', 'phase("Confirm")', "await_user", "do_publish != true"):
+        if snippet not in publish_text:
+            errors.append(f"publish workflow missing gate: {snippet}")
+    if "publish_findings.py" not in redactor_path.read_text(encoding="utf-8"):
+        errors.append("agents/redactor.md does not name publish_findings.py")
+
+    for name in ("seedcash-audit", "seedcash-issue", "seedcash-redactor"):
         skill = ROOT / ".grok" / "skills" / name / "SKILL.md"
         if not skill.is_file():
             errors.append(f"missing skill {name}")
+        else:
+            text = skill.read_text(encoding="utf-8")
+            if f"name: {name}" not in text.split("---", 2)[1]:
+                errors.append(f"skill {name} frontmatter name mismatch")
 
     disclosure = (ROOT / "brain" / "disclosure.md").read_text(encoding="utf-8")
     for impact in IMPACTS:

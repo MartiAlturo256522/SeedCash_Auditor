@@ -1,9 +1,7 @@
 # Notice
 
-This repository is the private brain of a SeedCash auditor.
+This repository is the public brain of a SeedCash auditor. The operator published it.
 
-It stores security hypotheses that are still open on the pinned tree. Those hypotheses name a broken check, an impact class, a file, and a fix direction. They do not contain triggering transactions or command payloads.
+It stores security hypotheses pinned to one commit. A hypothesis names a broken check, an impact class, a file, and a fix direction. It does not contain a triggering transaction, a command line, or a reproduction procedure.
 
-Keep the GitHub remote private. A public mirror has to drop `brain/invariants.md` rows whose `status_at_pin` is `open`, and drop anything under `reports/`, before the mirror is created.
-
-Filing an issue upstream is a separate, confirmed step. See `brain/issue-policy.md`.
+Filing an issue on SeedCash is a separate step. The batch filer creates issues only with `--confirm` and `SEEDCASH_AUDITOR_CONFIRM=yes`. See `brain/issue-policy.md`.

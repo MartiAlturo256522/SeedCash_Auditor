@@ -50,6 +50,10 @@
     "severity": {
       "type": "string",
       "enum": ["critical", "high", "medium", "low", "info"]
+    },
+    "dedupe_terms": {
+      "type": "array",
+      "items": { "type": "string", "minLength": 1 }
     }
   }
 }

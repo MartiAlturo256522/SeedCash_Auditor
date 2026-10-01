@@ -14,7 +14,15 @@ All of the following are required:
 4. `gh issue list` shows no open issue with the same title, unless the operator passed `--allow-duplicate`.
 5. The operator ran the filer with `--confirm` and `SEEDCASH_AUDITOR_CONFIRM=yes`.
 
-`tools/file_issue.py` prints the title and the body and does not call `gh` until step 5. The workflow `file-seedcash-issue` stops for a human confirmation before it can reach step 5.
+`tools/file_issue.py` prints the title and the body and does not call `gh issue create` until step 5. The workflow `file-seedcash-issue` stops for a human confirmation before it can reach step 5.
+
+## Batch
+
+`agents/redactor.md` exports every `file_ready: yes` row. `tools/publish_findings.py` files that directory, one issue per JSON file. The batch passes `--repo` on every call, so an image finding in the directory is filed on that repo. The single-finding tool still requires an explicit `--repo` when the lane is `os`.
+
+Before it renders a finding, the batch skips it when an open issue title already contains the invariant id or another phrase in `dedupe_terms`. Creation still requires step 5. If the open-issue list fails, a confirmed batch stops before any create.
+
+The workflow `publish-seedcash-issues` prints the drafts and stops. It reaches step 5 only when `args.publish` is true and the operator resumes past the confirmation.
 
 ## Severity
 

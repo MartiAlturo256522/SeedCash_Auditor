@@ -1,6 +1,6 @@
 # SeedCash Auditor
 
-Cerebro privado de un auditor multiagente. Su único trabajo es revisar SeedCash (con SeedSigner como línea de base) y dejar por escrito el chequeo que falla, la clase de impacto, el archivo y la dirección del arreglo.
+Cerebro público de un auditor multiagente. Su único trabajo es revisar SeedCash (con SeedSigner como línea de base) y dejar por escrito el chequeo que falla, la clase de impacto, el archivo y la dirección del arreglo.
 
 No modifica el árbol de SeedCash ni el de SeedSigner. No abre issues en GitHub hasta que tú confirmas el borrador concreto.
 
@@ -13,8 +13,9 @@ Los chequeos viven en `brain/invariants.md`. Cada skill y cada agente apuntan ah
 | `brain/` | Modelo de amenazas, arquitectura, invariantes, política de issues |
 | `agents/` | Encargo de cada carril |
 | `.grok/skills/` | Skills que Grok carga al trabajar en este repo |
-| `.grok/workflows/` | Auditoría completa, reverificación y alta de issues |
-| `tools/file_issue.py` | Borrador siempre; `gh` solo con confirmación |
+| `.grok/workflows/` | Auditoría completa, reverificación, un issue y el lote |
+| `tools/file_issue.py` | Un hallazgo: borrador siempre; `gh` solo con confirmación |
+| `tools/publish_findings.py` | El lote: un issue por hallazgo listo, saltando los que ya están abiertos |
 | `checklists/release.md` | Orden antes de grabar una imagen |
 
 Carriles: firma, CashTokens, canal QR, custodia de la semilla, lo que se ve contra lo que se firma, imagen del sistema, y el delta con SeedSigner.
@@ -78,6 +79,21 @@ El flujo `file-seedcash-issue` hace lo mismo y se detiene a pedir confirmación 
 
 El repo de destino por defecto es el `issue_repo` de `brain/pin.md`.
 
+El redactor escribe un issue por cada fila `file_ready: yes`. Primero el borrador del lote, sin crear nada:
+
+```bash
+python3 tools/export_findings.py --out findings-out
+python3 tools/publish_findings.py --dir findings-out
+```
+
+Publicar ese lote, solo después de pedirlo en esta conversación:
+
+```bash
+SEEDCASH_AUDITOR_CONFIRM=yes python3 tools/publish_findings.py --dir findings-out --confirm
+```
+
+El flujo `publish-seedcash-issues` hace el borrador y se detiene. Llega a crear issues cuando `args.publish` es `true` y se reanuda la confirmación. Un título que ya está abierto se salta. La política está en `brain/issue-policy.md`.
+
 ## Comprobaciones de este repo
 
 ```bash
@@ -86,6 +102,6 @@ make test
 
 Eso lintea el cerebro y corre los tests del filer. El filer de prueba no habla con GitHub.
 
-## Privado
+## Público
 
-Aquí hay hipótesis de fallos que siguen abiertos en el pin. El remoto tiene que seguir siendo privado. `NOTICE.md` dice qué habría que quitar antes de un espejo público.
+El remoto es público porque así se pidió. Las hipótesis nombran el chequeo, la clase de impacto, el archivo y la dirección del arreglo. `NOTICE.md` es el aviso. No hay transacciones de disparo ni procedimientos de reproducción.
